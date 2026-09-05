@@ -1,45 +1,38 @@
 import asyncio
 
 from aiogram import Bot, Dispatcher
-from aiogram.types import Message
-from aiogram.filters import CommandStart
 
 from config import TOKEN
+from handlers import register_handlers
 
 
 async def main():
-    print("BOT START", flush=True)
+    print("1. Запуск LoveBot...")
 
     bot = Bot(TOKEN)
     dp = Dispatcher()
 
-    @dp.message(CommandStart())
-    async def start(message: Message):
-        print(
-            f"START RECEIVED: user={message.from_user.id}, text={message.text}",
-            flush=True
-        )
+    print("2. Bot и Dispatcher созданы")
 
-        await message.answer("❤️ Я получил твоё сообщение! Бот работает.")
+    register_handlers(dp)
 
+    print("3. Обработчики зарегистрированы")
 
-    @dp.message()
-    async def any_message(message: Message):
-        print(
-            f"MESSAGE RECEIVED: user={message.from_user.id}, text={message.text}",
-            flush=True
-        )
+    try:
+        me = await bot.get_me()
+        print(f"4. LoveBot v2.0 запущен как @{me.username}")
+    except Exception as e:
+        print(f"ОШИБКА при подключении к Telegram: {e}")
+        await bot.session.close()
+        raise
 
-
-    me = await bot.get_me()
-    print(f"CONNECTED: @{me.username}", flush=True)
-
-    print("POLLING START", flush=True)
+    print("5. Запускаю polling...")
 
     try:
         await dp.start_polling(bot)
     finally:
         await bot.session.close()
+        print("6. Бот остановлен")
 
 
 if __name__ == "__main__":
