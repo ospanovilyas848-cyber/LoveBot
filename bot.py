@@ -1,34 +1,40 @@
 import asyncio
 
-print("A0: старт", flush=True)
+from aiogram import Bot, Dispatcher
+from aiogram.types import Message
+from aiogram.filters import CommandStart
+
+from config import TOKEN
+
 
 async def main():
-    from aiogram import Bot, Dispatcher
+    print("BOT START", flush=True)
 
-    from config import TOKEN
-    from handlers import register_handlers
-
-    print("A1: создаю Bot", flush=True)
     bot = Bot(TOKEN)
-
-    print("A2: проверяю Telegram", flush=True)
-    me = await bot.get_me()
-    print(f"A3: @{me.username} работает", flush=True)
-
-    print("A4: проверяю pending updates", flush=True)
-    updates = await bot.get_updates(offset=-1)
-
-    print(f"A5: Telegram вернул {len(updates)} update(s)", flush=True)
-
-    if updates:
-        print(f"A6: последний update_id = {updates[-1].update_id}", flush=True)
-
     dp = Dispatcher()
 
-    print("A7: регистрирую handlers", flush=True)
-    register_handlers(dp)
+    @dp.message(CommandStart())
+    async def start(message: Message):
+        print(
+            f"START RECEIVED: user={message.from_user.id}, text={message.text}",
+            flush=True
+        )
 
-    print("A8: запускаю polling", flush=True)
+        await message.answer("❤️ Я получил твоё сообщение! Бот работает.")
+
+
+    @dp.message()
+    async def any_message(message: Message):
+        print(
+            f"MESSAGE RECEIVED: user={message.from_user.id}, text={message.text}",
+            flush=True
+        )
+
+
+    me = await bot.get_me()
+    print(f"CONNECTED: @{me.username}", flush=True)
+
+    print("POLLING START", flush=True)
 
     try:
         await dp.start_polling(bot)
