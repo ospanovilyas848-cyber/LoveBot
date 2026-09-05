@@ -29,7 +29,21 @@ jobs:
       - name: Install dependencies
         run: pip install -r requirements.txt
 
+      - name: Check bot file
+        run: |
+          echo "=== CURRENT DIRECTORY ==="
+          pwd
+          echo ""
+          echo "=== COMMIT ==="
+          git rev-parse --short HEAD
+          echo ""
+          echo "=== BOT.PY FIRST 20 LINES ==="
+          head -20 bot.py
+          echo ""
+          echo "=== BOT.PY EXISTS ==="
+          ls -lh bot.py
+
       - name: Start bot
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-        run: python bot.py
+        run: python -u bot.py
